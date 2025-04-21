@@ -7,6 +7,7 @@ public class ConnectionButtons : MonoBehaviour
     {
         NetworkManager.Singleton.StartHost();
     }
+
     public void StartClient()
     {
         NetworkManager.Singleton.StartClient();

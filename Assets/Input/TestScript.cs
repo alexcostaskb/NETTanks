@@ -1,13 +1,11 @@
-using System;
 using UnityEngine;
 
 public class TestScript : MonoBehaviour
 {
-
     [SerializeField] private InputReader inputReader;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
         inputReader.MoveEvent += HandleMove;
     }
@@ -17,7 +15,7 @@ public class TestScript : MonoBehaviour
         Debug.Log(vector);
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         inputReader.MoveEvent -= HandleMove;
     }

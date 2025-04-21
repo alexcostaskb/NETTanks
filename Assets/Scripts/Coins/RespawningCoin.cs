@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RespawningCoin : Coin
@@ -27,7 +25,10 @@ public class RespawningCoin : Coin
             return 0;
         }
 
-        if (alreadyCollected) { return 0; }
+        if (alreadyCollected)
+        {
+            return 0;
+        }
 
         alreadyCollected = true;
 

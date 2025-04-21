@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class ProjectileLauncher : NetworkBehaviour
 {
-    
     [Header("References")]
     [SerializeField] private InputReader inputReader;
+
     [SerializeField] private Transform projectileSpawnPoint;
     [SerializeField] private GameObject serverProjectilePrefab;
     [SerializeField] private GameObject clientProjectilePrefab;
@@ -15,36 +15,41 @@ public class ProjectileLauncher : NetworkBehaviour
 
     [Header("Settings")]
     [SerializeField] private float projectileSpeed;
+
     [SerializeField] private float fireRate;
     [SerializeField] private float muzzleFlashDuration;
     [SerializeField] private int costToFire;
-
 
     private bool shouldFire;
     private float timer;
     private float muzzleFlashTimer;
 
-
     public override void OnNetworkSpawn()
     {
-        if(!IsOwner) {return; }
+        if (!IsOwner)
+        {
+            return;
+        }
 
         inputReader.PrimaryFireEvent += HandlePrimaryFire;
     }
 
     public override void OnNetworkDespawn()
     {
-        if(!IsOwner) {return; }
+        if (!IsOwner)
+        {
+            return;
+        }
+
         inputReader.PrimaryFireEvent -= HandlePrimaryFire;
     }
 
     private void HandlePrimaryFire(bool shouldFire)
     {
         this.shouldFire = shouldFire;
-
     }
 
-    void Update()
+    private void Update()
     {
         if (muzzleFlashTimer > 0f)
         {
@@ -56,16 +61,25 @@ public class ProjectileLauncher : NetworkBehaviour
             }
         }
 
-        if(!IsOwner) {return; }
+        if (!IsOwner)
+        {
+            return;
+        }
 
         if (timer > 0)
         {
             timer -= Time.deltaTime;
         }
 
-        if(!shouldFire) {return; }
+        if (!shouldFire)
+        {
+            return;
+        }
 
-        if (timer > 0) { return; }
+        if (timer > 0)
+        {
+            return;
+        }
 
         if (wallet.TotalCoins.Value < costToFire) { return; }
 
@@ -73,7 +87,6 @@ public class ProjectileLauncher : NetworkBehaviour
         SpawnDummyProjectile(projectileSpawnPoint.position, projectileSpawnPoint.up);
 
         timer = 1 / fireRate;
-
     }
 
     private void SpawnDummyProjectile(Vector3 position, Vector3 up)
@@ -86,35 +99,34 @@ public class ProjectileLauncher : NetworkBehaviour
 
         Physics2D.IgnoreCollision(playerCollider, projectileInstance.GetComponent<Collider2D>());
 
-        if (projectileInstance.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+        if (projectileInstance.TryGetComponent(out Rigidbody2D rb))
         {
             rb.linearVelocity = rb.transform.up * projectileSpeed;
         }
-
     }
 
     [Rpc(SendTo.Server)]
     private void PrimaryFireServerRpc(Vector3 position, Vector3 up)
     {
-
-        if (wallet.TotalCoins.Value < costToFire) { return; }
+        if (wallet.TotalCoins.Value < costToFire)
+        {
+            return;
+        }
 
         wallet.SpendCoins(costToFire);
 
-        GameObject projectileInstance = Instantiate(
-            serverProjectilePrefab,
-            position,
-            Quaternion.identity);
+        GameObject projectileInstance = Instantiate(serverProjectilePrefab, position, Quaternion.identity);
+
         projectileInstance.transform.up = up;
 
         Physics2D.IgnoreCollision(playerCollider, projectileInstance.GetComponent<Collider2D>());
 
-        if (projectileInstance.TryGetComponent<DealDamageOnContact>(out DealDamageOnContact dealDamage))
+        if (projectileInstance.TryGetComponent(out DealDamageOnContact dealDamage))
         {
             dealDamage.SetOwner(OwnerClientId);
         }
 
-        if (projectileInstance.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+        if (projectileInstance.TryGetComponent(out Rigidbody2D rb))
         {
             rb.linearVelocity = rb.transform.up * projectileSpeed;
         }
@@ -123,9 +135,13 @@ public class ProjectileLauncher : NetworkBehaviour
     }
 
     [Rpc(SendTo.ClientsAndHost)]
-    private void SpawnDummyProjectileClientRpc (Vector3 position, Vector3 up)
+    private void SpawnDummyProjectileClientRpc(Vector3 position, Vector3 up)
     {
-        if(IsOwner) { return; }
+        if (IsOwner)
+        {
+            return;
+        }
+
         SpawnDummyProjectile(position, up);
     }
 }

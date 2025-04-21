@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
 public class Health : NetworkBehaviour
 {
-    [field: SerializeField] public int MaxHealth { get; private set; } = 100;
+    [field: SerializeField]
+    public int MaxHealth { get; private set; } = 100;
 
     public NetworkVariable<int> CurrentHealth = new NetworkVariable<int>();
 
@@ -16,7 +15,10 @@ public class Health : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (!IsServer) { return; }
+        if (!IsServer)
+        {
+            return;
+        }
 
         CurrentHealth.Value = MaxHealth;
     }
@@ -38,7 +40,7 @@ public class Health : NetworkBehaviour
         int newHealth = CurrentHealth.Value + value;
         CurrentHealth.Value = Mathf.Clamp(newHealth, 0, MaxHealth);
 
-        if(CurrentHealth.Value == 0)
+        if (CurrentHealth.Value == 0)
         {
             OnDie?.Invoke(this);
             isDead = true;
